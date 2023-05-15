@@ -88,7 +88,7 @@ async function consultarPatente(patente, reintento = 0) {
         await page.type(searchResultSelector, patente)
         console.log("listo patente");
         const searchResultSelector2 = "#btnConsultar";
-        await page.waitForSelector(searchResultSelector2,{timeout:10000});
+        await page.waitForSelector(searchResultSelector2, {timeout: 10000});
         await page.click(searchResultSelector2);
         console.log("boton clicked");
         const datosTabla = "#tblDataVehicle > tbody"
@@ -96,7 +96,7 @@ async function consultarPatente(patente, reintento = 0) {
         console.log("resultados");
         //await page.waitForSelector(datosTabla,{timeout:10000});
         console.log("tabla");
-        await waitForMultipleSelectors(page, [datosTabla,datosError], 10000);
+        await waitForMultipleSelectors(page, [datosTabla, datosError], 10000);
         let results = []
         // Si el selector del elemento esperado se encuentra, realizar acciones
         if (await page.$('#tblDataVehicle > tbody')) {
@@ -134,7 +134,7 @@ async function consultarPatente(patente, reintento = 0) {
             await consultarPatente(patente, 1)
         } else {
             await browser.close()
-            return {message: 'Error ', error};
+            return {message: 'Error ', error: error.toString()};
         }
 
     }
@@ -142,7 +142,7 @@ async function consultarPatente(patente, reintento = 0) {
 
 async function waitForMultipleSelectors(page, selectors, timeout) {
     const promises = selectors.map((selector) =>
-        page.waitForSelector(selector, { timeout })
+        page.waitForSelector(selector, {timeout})
     );
 
     try {
