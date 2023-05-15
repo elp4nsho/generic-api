@@ -120,15 +120,15 @@ async function consultarPatente(patente, reintento = 0) {
 
         // Si el selector del mensaje de error se encuentra, manejar el error
         if (await page.$('body > main > article > div.the-content > div:nth-child(7) > center > div > div > h2')) {
-            throw new Error({message: 'Error al consultar la patente', error: 'Patente no encontrada'});
+            throw new Error('Patente no encontrada');
         }
-
-
 
         await browser.close()
         return results
 
     } catch (error) {
+
+        console.log("error");
         if (false) {
             await consultarPatente(patente, 1)
         } else {
