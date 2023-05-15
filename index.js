@@ -92,25 +92,39 @@ async function consultarPatente(patente, reintento = 0) {
         await page.click(searchResultSelector2);
         console.log("boton clicked");
         const datosTabla = "#tblDataVehicle > tbody"
+        const datosError = "body > main > article > div.the-content > div:nth-child(7) > center > div > div > h2"
         console.log("resultados");
-        await page.waitForSelector(datosTabla,{timeout:10000});
+        //await page.waitForSelector(datosTabla,{timeout:10000});
         console.log("tabla");
-        let results = await page.$eval('#tblDataVehicle > tbody', tbody => [...tbody.rows].map(r => [...r.cells].map(c => c.innerText)))
-        results = results.filter(o => o.length > 1)
-        results = results.map(o => {
-            let obj = {
-                key: o[0],
-                value: o[1]
+        await waitForMultipleSelectors(page, [datosTabla,datosError], 10000);
+        let results = []
+        // Si el selector del elemento esperado se encuentra, realizar acciones
+        if (await page.$('#tblDataVehicle > tbody')) {
+            let results = await page.$eval('#tblDataVehicle > tbody', tbody => [...tbody.rows].map(r => [...r.cells].map(c => c.innerText)))
+            results = results.filter(o => o.length > 1)
+            results = results.map(o => {
+                let obj = {
+                    key: o[0],
+                    value: o[1]
+                }
+                return obj
+            })
+            console.log(results);
+            let objToSave = {
+                patente: patente,
+                results: results
             }
-            return obj
-        })
-        console.log(results);
-        let objToSave = {
-            patente: patente,
-            results: results
+            let patenteJson = new patenteJSON(objToSave);
+            await patenteJson.save();
         }
-        let patenteJson = new patenteJSON(objToSave);
-        await patenteJson.save();
+
+        // Si el selector del mensaje de error se encuentra, manejar el error
+        if (await page.$('body > main > article > div.the-content > div:nth-child(7) > center > div > div > h2')) {
+            throw new Error('Patente no encontrada');
+        }
+
+
+
         await browser.close()
         return results
 
@@ -122,5 +136,17 @@ async function consultarPatente(patente, reintento = 0) {
             return {message: 'Error ', error};
         }
 
+    }
+}
+
+async function waitForMultipleSelectors(page, selectors, timeout) {
+    const promises = selectors.map((selector) =>
+        page.waitForSelector(selector, { timeout })
+    );
+
+    try {
+        await Promise.race(promises);
+    } catch (error) {
+        throw new Error(`No se encontró ninguno de los selectores: ${selectors}`);
     }
 }
