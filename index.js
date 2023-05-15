@@ -79,6 +79,13 @@ async function consultarPatente(patente, reintento = 0) {
         await page.waitForSelector(searchResultSelector, {timeout: 10000});
         await page.type(searchResultSelector, patente)
         await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
+        await page.type(searchResultSelector, patente)
         console.log("listo patente");
         const searchResultSelector2 = "#btnConsultar";
         await page.waitForSelector(searchResultSelector2,{timeout:10000});
